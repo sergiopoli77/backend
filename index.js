@@ -13,11 +13,20 @@ app.get("/about", (req, res) =>
   })
 );
 
+//method http
 app.post("/contoh", (req, res) => res.send("request method POST"));
 app.put("/contoh", (req, res) => res.send("request method PUT"));
 app.delete("/contoh", (req, res) => res.send("request method DELETE"));
 app.patch("/contoh", (req, res) => res.send("request method PATCH"));
-app.all("/universal", (req, res) => res.send("request dengan method "));
+app.all("/universal", (req, res) =>
+  res.send(`request dengan method ${req.method}`)
+);
+
+//routing dinamis menggunakna params
+app.get("/post/:id", (req, res) => res.send(`Artikel ke - $ {req.params.id}`));
+
+
+
 
 const hostname = "127.0.0.1";
 const port = 3000;
