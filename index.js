@@ -13,10 +13,11 @@ app.get("/about", (req, res) =>
   })
 );
 
-app.post ('/contoh', (req,res) => res.send('reques method POST'))
-app.put ('/contoh', (req,res) => res.send('reques method PUT'))
-app.delete ('/contoh', (req,res) => res.send('reques method DELETE'))
-app.patch ('/contoh', (req,res) => res.send('reques method PATCH'))
+app.post("/contoh", (req, res) => res.send("request method POST"));
+app.put("/contoh", (req, res) => res.send("request method PUT"));
+app.delete("/contoh", (req, res) => res.send("request method DELETE"));
+app.patch("/contoh", (req, res) => res.send("request method PATCH"));
+app.all("/universal", (req, res) => res.send("request dengan method "));
 
 const hostname = "127.0.0.1";
 const port = 3000;
