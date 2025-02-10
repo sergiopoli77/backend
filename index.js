@@ -13,6 +13,11 @@ app.get("/about", (req, res) =>
   })
 );
 
+app.post ('/contoh', (req,res) => res.send('reques method POST'))
+app.put ('/contoh', (req,res) => res.send('reques method PUT'))
+app.delete ('/contoh', (req,res) => res.send('reques method DELETE'))
+app.patch ('/contoh', (req,res) => res.send('reques method PATCH'))
+
 const hostname = "127.0.0.1";
 const port = 3000;
 app.listen(port, hostname, () =>
