@@ -22,11 +22,14 @@ app.all("/universal", (req, res) =>
   res.send(`request dengan method ${req.method}`)
 );
 
-//routing dinamis menggunakna params
+// 1. Routing dinamis menggunakan params
 app.get("/post/:id", (req, res) => res.send(`Artikel ke - $ {req.params.id}`));
 
-
-
+// 2. Menggunakan query string
+app.get("post", (req, res) => {
+  const { page } = req.query;
+  res.send(`Query yang didapatkan adalah : ${page}`);
+});
 
 const hostname = "127.0.0.1";
 const port = 3000;
