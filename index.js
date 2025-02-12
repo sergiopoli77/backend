@@ -2,29 +2,34 @@ const http = require("http");
 const { hello, greetings } = require("./helloWorld");
 const moment = require("moment");
 const express = require("express");
+const users = require("./users");
+
 const app = express();
 
-app.get("/", (req, res) => res.send("Hello World"));
+app.get("/", (req, res) => res.send("This the homepage"));
+
 app.get("/about", (req, res) =>
   res.status(200).json({
     status: "success",
-    message: "About page",
-    data: [],
+    message: "Response success",
+    description: "Exercise #03",
+    date: moment().format("YYYY-MM-DDTHH:mm:ssZ"),
   })
 );
-app.post("/contoh", (req, res) => res.send("request method POST"));
-app.put("/contoh", (req, res) => res.send("Request method PUT"));
-app.delete("/contoh", (req, res) => res.send("Request method DELETE"));
-app.patch("/contoh", (req, res) => res.send("Request method PATCH"));
 
-app.all("/universal", (req, res) => res.send(`Request method ${req.method}`));
-// Routing dinamis
-// 1. Menggunakan params
-app.get("/post/:id", (req, res) => res.send(`Artikel ke - ${req.params.id}`));
-// 2. Menggunakan query string
-app.get("/post", (req, res) => {
-  const { page, sort } = req.query;
-  res.send(`Query yang didapatkan adalah : ${page}, sort : ${sort}`);
+app.get("/users", (req, res) => {
+  res.status(200).json({
+    status: "success",
+    users,
+  });
+});
+
+app.use((req, res) => {
+  res.status(404).json({
+    status: "not found",
+    message: "Route tidak ditemukan",
+    date: moment().format("YYYY-MM-DDTHH:mm:ssZ"),
+  });
 });
 
 const hostname = "127.0.0.1";
