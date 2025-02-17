@@ -2,19 +2,22 @@ const http = require("http");
 const { hello, greetings } = require("./helloWorld");
 const moment = require("moment");
 const express = require("express");
+const morgan = require("morgan");
+const errorhandler = require("errorhandler");
 const app = express();
 
-//middleware
+//Middleware
 const log = (req, res, next) => {
   console.log(
     moment().format("h:mm:ss a") + " " + req.originalUrl + " " + req.ip
   );
-
   next();
 };
 
-app.use(log);
+app.use(morgan("tiny"));
+app.use(errorhandler);
 
+// Routing
 app.get("/", (req, res) => res.send("Hello World"));
 app.get("/about", (req, res) =>
   res.status(200).json({
@@ -32,10 +35,18 @@ app.all("/universal", (req, res) => res.send(`Request method ${req.method}`));
 // Routing dinamis
 // 1. Menggunakan params
 app.get("/post/:id", (req, res) => res.send(`Artikel ke - ${req.params.id}`));
-// 2. Menggunakan query string
+// 2. Menggunakan Query String
 app.get("/post", (req, res) => {
   const { page, sort } = req.query;
-  res.send(`Query yang didapatkan adalah : ${page}, sort : ${sort}`);
+  res.send(`Query string= page :${page}, sort : ${sort}`);
+});
+
+//Middleware untuk 404
+app.use((req, res, next) => {
+  res.status(404).json({
+    status: "error",
+    message: "resource tidak ditemukan",
+  });
 });
 
 const hostname = "127.0.0.1";
