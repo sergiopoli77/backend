@@ -24,14 +24,6 @@ app.get("/users", (req, res) => {
   });
 });
 
-app.use((req, res) => {
-  res.status(404).json({
-    status: "not found",
-    message: "Route tidak ditemukan",
-    date: moment().format("YYYY-MM-DDTHH:mm:ssZ"),
-  });
-});
-
 const hostname = "127.0.0.1";
 const port = 3000;
 app.listen(port, hostname, () =>
