@@ -4,6 +4,17 @@ const moment = require("moment");
 const express = require("express");
 const app = express();
 
+//middleware
+const log = (req, res, next) => {
+  console.log(
+    moment().format("h:mm:ss a") + " " + req.originalUrl + " " + req.ip
+  );
+
+  next();
+};
+
+app.use(log);
+
 app.get("/", (req, res) => res.send("Hello World"));
 app.get("/about", (req, res) =>
   res.status(200).json({
