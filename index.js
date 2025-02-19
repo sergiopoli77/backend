@@ -1,51 +1,53 @@
-const http = require("http");
-const { hello, greetings } = require("./helloWorld");
-const moment = require("moment");
 const express = require("express");
 const morgan = require("morgan");
 const errorhandler = require("errorhandler");
+const users = require("./users");
+
 const app = express();
 
-//Middleware
-const log = (req, res, next) => {
-  console.log(
-    moment().format("h:mm:ss a") + " " + req.originalUrl + " " + req.ip
-  );
-  next();
-};
-
+// Middleware untuk logging
 app.use(morgan("tiny"));
-app.use(errorhandler);
+app.use(errorhandler());
 
-// Routing
-app.get("/", (req, res) => res.send("Hello World"));
-app.get("/about", (req, res) =>
+// Endpoint untuk mendapatkan semua users
+app.get("/users", (req, res) => {
   res.status(200).json({
     status: "success",
-    message: "About page",
-    data: [],
-  })
-);
-app.post("/contoh", (req, res) => res.send("request method POST"));
-app.put("/contoh", (req, res) => res.send("Request method PUT"));
-app.delete("/contoh", (req, res) => res.send("Request method DELETE"));
-app.patch("/contoh", (req, res) => res.send("Request method PATCH"));
-
-app.all("/universal", (req, res) => res.send(`Request method ${req.method}`));
-// Routing dinamis
-// 1. Menggunakan params
-app.get("/post/:id", (req, res) => res.send(`Artikel ke - ${req.params.id}`));
-// 2. Menggunakan Query String
-app.get("/post", (req, res) => {
-  const { page, sort } = req.query;
-  res.send(`Query string= page :${page}, sort : ${sort}`);
+    data: users,
+  });
 });
 
-//Middleware untuk 404
-app.use((req, res, next) => {
+// Endpoint untuk mendapatkan user berdasarkan nama
+app.get("/users/:name", (req, res) => {
+  const userName = req.params.name.toLowerCase();
+  const user = users.find((u) => u.name.toLowerCase() === userName);
+
+  if (!user) {
+    return res.status(404).json({
+      status: "error",
+      message: "resource tidak ditemukan",
+    });
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: user,
+  });
+});
+
+// Middleware untuk menangani 404
+app.use((req, res) => {
   res.status(404).json({
     status: "error",
     message: "resource tidak ditemukan",
+  });
+});
+
+// Middleware untuk menangani error server
+app.use((err, req, res, next) => {
+  res.status(500).json({
+    status: "error",
+    message: "terjadi kesalahan pada server",
   });
 });
 
