@@ -8,15 +8,12 @@ const app = express();
 const routers = require("./routers");
 
 //Middleware
-const log = (req, res, next) => {
-  console.log(
-    moment().format("h:mm:ss a") + " " + req.originalUrl + " " + req.ip
-  );
-  next();
-};
+const log = (req, res, next) => {};
 
 app.use(morgan("tiny"));
-app.use(errorhandler);
+// app.use(errorhandler);
+
+app.use(express.urlencoded({ extended: true }));
 
 //Routing
 app.use(routers);
