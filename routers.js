@@ -2,6 +2,17 @@ const express = require("express");
 const routers = express.Router();
 
 // Routing
+routers.post("/login", (req, res) => {
+  const { username, password } = req.body;
+  res.status(200).json({
+    status: "success",
+    message: "Login Page",
+    data: {
+      username: username,
+      password: password,
+    },
+  });
+});
 routers.get("/", (req, res) => res.send("Hello World"));
 routers.get("/about", (req, res) =>
   res.status(200).json({
