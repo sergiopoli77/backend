@@ -1,50 +1,31 @@
+const http = require("http");
+const { hello, greetings } = require("./helloWorld");
+const moment = require("moment");
 const express = require("express");
 const morgan = require("morgan");
-const users = require("./users"); // Import data dari users.js
-
+const errorhandler = require("errorhandler");
 const app = express();
+const routers = require("./routers");
 
-// Middleware untuk logging
+//Middleware
+const log = (req, res, next) => {
+  console.log(
+    moment().format("h:mm:ss a") + " " + req.originalUrl + " " + req.ip
+  );
+  next();
+};
+
 app.use(morgan("tiny"));
+app.use(errorhandler);
 
-app.get("/users", (req, res) => {
-  res.json({
-    status: "success",
-    data: users,
-  });
-});
+//Routing
+app.use(routers);
 
-app.get("/users/:name", (req, res) => {
-  const name = req.params.name.toLowerCase();
-  const user = users.find((u) => u.name.toLowerCase() === name);
-
-  if (!user) {
-    return res.status(404).json({
-      status: "error",
-      message: "Data user tidak ditemukan",
-    });
-  }
-
-  res.json({
-    status: "success",
-    data: user,
-  });
-});
-
-// Middleware untuk penanganan Routing 404
-app.use((req, res) => {
+//Middleware untuk 404
+app.use((req, res, next) => {
   res.status(404).json({
     status: "error",
     message: "resource tidak ditemukan",
-  });
-});
-
-// Middleware untuk penanganan Error Server 500
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    status: "error",
-    message: "terjadi kesalahan pada server",
   });
 });
 
