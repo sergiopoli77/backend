@@ -18,7 +18,7 @@ const path = require("path");
 
 // routers.get("/download", (req, res) => {
 //   const filename = "dummy.png";
-//   res.sendFile(path.join(__dirname, "/donwload", filename), {
+//   res.sendFile(path.join(__dirname, "/download", filename), {
 //     headers: {
 //       "Content-Disposition": 'attachment; filename="dummy-photo.png',
 //     },

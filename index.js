@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const errorhandler = require("errorhandler");
 const app = express();
 const routers = require("./routers");
+const path = require("path");
 
 //Middleware
 const log = (req, res, next) => {};
@@ -14,6 +15,7 @@ app.use(morgan("tiny"));
 // app.use(errorhandler);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
 
 //Routing
 app.use(routers);
