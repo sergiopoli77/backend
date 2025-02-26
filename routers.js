@@ -16,13 +16,19 @@ const path = require("path");
 //   res.sendFile(path.join(__dirname), filename);
 // });
 
+// routers.get("/download", (req, res) => {
+//   const filename = "dummy.png";
+//   res.sendFile(path.join(__dirname, "/donwload", filename), {
+//     headers: {
+//       "Content-Disposition": 'attachment; filename="dummy-photo.png',
+//     },
+//   });
+// });
+
+//cara lain
 routers.get("/download", (req, res) => {
   const filename = "dummy.png";
-  res.sendFile(path.join(__dirname, "/donwload", filename), {
-    headers: {
-      "Content-Disposition": 'attachment; filename="dummy-photo.png',
-    },
-  });
+  res.download(path.join(__dirname, "/download", filename), "dummpy-photo.png");
 });
 
 routers.post("/login", (req, res) => {
