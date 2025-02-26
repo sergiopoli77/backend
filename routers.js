@@ -1,10 +1,24 @@
 const express = require("express");
 const routers = express.Router();
+const path = require("path");
 
 // Routing
+//donwload
+// routers.get("/download", (req, res) => {
+//   const filename = "dummy.png";
+//   res.sendFile(__dirname + "/download/" + filename);
+// });
+
+//path
+//kalau di luar
+// routers.get("/download", (req, res) => {
+//   const filename = "dummy.png";
+//   res.sendFile(path.join(__dirname), filename);
+// });
+
 routers.get("/download", (req, res) => {
   const filename = "dummy.png";
-  res.sendFile(__dirname + "/download/" + filename);
+  res.sendFile(path.join(__dirname, "/donwload", filename));
 });
 
 routers.post("/login", (req, res) => {
