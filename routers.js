@@ -1,8 +1,23 @@
 const express = require("express");
 const routers = express.Router();
 const path = require("path");
+const fs = require("fs");
+const multer = require("multer");
+const upload = multer({ dest: "public" });
 
 // Routing
+routers.post("/upload", upload.single("file"), (req, res) => {
+  const file = req.file;
+
+  if (file) {
+    const target = path.join(__dirname, "public", file.originalname);
+    fs.renameSync(file.path, target);
+    res.send("File berhasil diupload");
+  } else {
+    res.status(400).send("File gagal diupload");
+  }
+});
+
 //donwload
 // routers.get("/download", (req, res) => {
 //   const filename = "dummy.png";
