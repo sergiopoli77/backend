@@ -5,6 +5,7 @@ const fs = require("fs");
 const multer = require("multer");
 const upload = multer({ dest: "public" });
 
+
 // Routing
 routers.post("/upload", upload.single("file"), (req, res) => {
   const file = req.file;
@@ -18,7 +19,7 @@ routers.post("/upload", upload.single("file"), (req, res) => {
   }
 });
 
-//donwload
+//download
 // routers.get("/download", (req, res) => {
 //   const filename = "dummy.png";
 //   res.sendFile(__dirname + "/download/" + filename);
