@@ -3,14 +3,19 @@ const { hello, greetings } = require("./helloWorld");
 const moment = require("moment");
 const express = require("express");
 const morgan = require("morgan");
-const errorhandler = require("errorhandler");
+// const errorhandler = require("errorhandler");
 const app = express();
 const routers = require("./routers");
 const path = require("path");
 const cors = require("cors");
 
 //Middleware
-const log = (req, res, next) => {};
+const log = (req, res, next) => {
+  console.log(
+    moment().format("h:mm:ss a") + " " + req.originalUrl + " " + req.ip
+  );
+  next();
+};
 
 app.use(morgan("tiny"));
 // app.use(errorhandler);
