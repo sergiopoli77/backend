@@ -3,20 +3,12 @@ const routers = express.Router();
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
+const uploud = multer({ dest: "public" });
+//const users = require("./users");
 const client = require("./mongodb");
 const ObjectId = require("mongodb").ObjectId;
 
-const imageFilter = (req, file, cb) => {
-  if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-    return cb(null, false);
-  }
-  cb(null, true);
-};
-
-const upload = multer({ dest: "public", fileFilter: imageFilter });
-
-// Routing
-// Get all users
+// Get All Users
 routers.get("/users", async (req, res) => {
   try {
     const db = client.db("latihan");
@@ -27,13 +19,10 @@ routers.get("/users", async (req, res) => {
       data: users,
     });
   } catch (error) {
-    res.json({
-      status: "error",
-    });
+    console.error(error);
   }
 });
-
-// Get single user
+// get single users
 routers.get("/users/:id", async (req, res) => {
   try {
     const db = client.db("latihan");
@@ -42,75 +31,200 @@ routers.get("/users/:id", async (req, res) => {
     });
     res.status(200).json({
       status: "success",
-      message: "single user",
+      message: "user found",
       data: user,
     });
   } catch (error) {
-    res.json({
+    res.status(500).json({
       status: "error",
+      message: "Internal server error",
+    });
+  }
+});
+//insert user
+routers.post("/users", async (req, res) => {
+  try {
+    const db = client.db("latihan");
+    const user = await db.collection("users").insertOne(req.body);
+    res.status(201).json({
+      status: "success",
+      message: "user created",
+      data: user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+    });
+  }
+});
+//update users
+routers.put("/users/:id", async (req, res) => {
+  try {
+    const db = client.db("latihan");
+    const user = await db
+      .collection("users")
+      .updateOne({ _id: new ObjectId(req.params.id) }, { $set: req.body });
+    res.status(200).json({
+      status: "success",
+      message: "user updated",
+      data: user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+    });
+  }
+});
+//delete users
+routers.delete("/users/:id", async (req, res) => {
+  try {
+    const db = client.db("latihan");
+    const user = await db.collection("users").deleteOne({
+      _id: new ObjectId(req.params.id),
+    });
+    res.status(200).json({
+      status: "success",
+      message: "user deleted",
+      data: user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+    });
+  }
+});
+//Get orders users
+routers.get("/users-with-orders", async (req, res) => {
+  try {
+    const db = client.db("latihan");
+    const usersWithOrders = await db
+      .collection("users")
+      .aggregate([
+        {
+          $lookup: {
+            from: "orders",
+            localField: "_id",
+            foreignField: "userId",
+            as: "orders",
+          },
+        },
+      ])
+      .toArray();
+
+    res.status(200).json({
+      status: "success",
+      message: "Users with their orders retrieved successfully",
+      data: usersWithOrders,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error",
     });
   }
 });
 
-routers.post("/upload", upload.single("file"), (req, res) => {
+// // Endpoint 1
+// routers.get("/users", (req, res) => {
+//   res.json(users);
+// });
+
+//Endpoint 2
+routers.get("/users/:name", (req, res) => {
+  const name = req.params.name.toLowerCase();
+  const user = users.find((u) => u.name.toLowerCase() === name);
+
+  if (!user) {
+    return res.status(404).json({ message: "Data user tidak ditemukan" });
+  }
+  res.json(user);
+});
+
+// Endpoint 3
+routers.post("/users", (req, res) => {
+  if (Object.keys(req.body).length === 0) {
+    res.json({
+      message: "Masukkan data yang akan diubah",
+    });
+  } else {
+    let name = req.params.name.toLowerCase();
+    let firstLetter = name.charAt(0).toUpperCase();
+    name = firstLetter + name.slice(1);
+    users.push({
+      id: Number(req.body.id),
+      name: name,
+    });
+    res.json(users);
+  }
+});
+
+// Endpoint 4
+routers.get("/download", (req, res) => {
+  const filePath = path.join(__dirname, "assets", "dummy.png");
+  res.sendFile(filePath);
+});
+
+// Endpoint 5
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+const upload = multer({ storage });
+
+routers.post("/upload", uploud.single("file"), (req, res) => {
   const file = req.file;
   if (file) {
     const target = path.join(__dirname, "public", file.originalname);
-    fs.renameSync(file.path, target); //rename file agar sama dengan original file name
+    fs.renameSync(file.path, target);
     res.send("file berhasil diupload");
   } else {
     res.send("file gagal diupload");
   }
 });
 
-routers.get("/download", (req, res) => {
-  const filename = "dummy.png";
-  res.download(path.join(__dirname, "/download", filename), "dummy-photo.png");
-});
+// Endpoint 6
+routers.put("/users/:name", (req, res) => {
+  if (Object.keys(req.body).length === 0) {
+    res.json({
+      message: "Masukkan data yang akan diubah",
+    });
+  }
+  // nama diubah menjadi titlecase
+  let name = req.params.name.toLowerCase();
+  let firstLetter = name.charAt(0).toUpperCase();
+  name = firstLetter + name.slice(1);
+  for (let i = 0; i < users.length; i++) {
+    if (users[i].name === name) {
+      users[i].name = req.body.name;
+      users[i].id = req.body.id;
 
-routers.post("/login", (req, res) => {
-  const { username, password } = req.body;
-  res.status(200).json({
-    status: "success",
-    message: "Login page",
-    data: {
-      username: username,
-      password: password,
-    },
+      res.json(users[i]);
+    }
+  }
+  // kirim pesan apabila data tidak ditemukan
+  res.json({
+    message: "Data user tidak ditemukan",
   });
 });
-routers.get("/", (req, res) => res.send("Hello World"));
-routers.get("/about", (req, res) =>
-  res.status(200).json({
-    status: "success",
-    message: "About page",
-    data: [],
-  })
-);
-routers.put("/about", (req, res) =>
-  res.status(200).json({
-    status: "success",
-    message: "About page",
-    data: [],
-  })
-);
-routers.post("/contoh", (req, res) => res.send("request method POST"));
-routers.put("/contoh", (req, res) => res.send("Request method PUT"));
-routers.delete("/contoh", (req, res) => res.send("Request method DELETE"));
-routers.patch("/contoh", (req, res) => res.send("Request method PATCH"));
 
-routers.all("/universal", (req, res) =>
-  res.send(`Request method ${req.method}`)
-);
-// Routing dinamis
-// 1. Menggunakan params
-routers.get("/post/:id", (req, res) =>
-  res.send(`Artikel ke - ${req.params.id}`)
-);
-// 2. Menggunakan Query String
-routers.get("/post", (req, res) => {
-  const { page, sort } = req.query;
-  res.send(`Query string= page :${page}, sort : ${sort}`);
+// Endpoint 7
+routers.delete("/users/:name", (req, res) => {
+  let name = req.params.name.toLowerCase();
+  let firstLetter = name.charAt(0).toUpperCase();
+  name = firstLetter + name.slice(1);
+
+  const itemToDelete = users.find((el) => el.name === name);
+  const index = users.indexOf(itemToDelete);
+
+  users.splice(index, 1);
+  res.json(users);
 });
 
 module.exports = routers;
