@@ -1,11 +1,17 @@
 const mongoose = require("mongoose");
 
 //Buat Schema
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  age: Number,
-  status: String,
-});
+const userSchema = mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    age: Number,
+    status: String,
+  },
+  {
+    versionKey: false,
+    timestamps: true,
+  }
+);
 
 //Buat Model
 const User = mongoose.model("User", userSchema);

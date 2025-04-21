@@ -23,13 +23,53 @@ const upload = multer({ dest: "public", fileFilter: imageFilter });
 routers.get("/users", async (req, res) => {
   const users = await Users.find();
   res.json({
-    status: "success",
+    status: "success!!!",
     message: "list users",
     data: users,
   });
 });
 
-// Get single user
+// routers.get("/users/:id", async (req, res) => {
+//   id = req.params.id;
+//   const users = await Users.findById(id);
+//   res.json({
+//     status: "success",
+//     message: "list users",
+//     data: users,
+//   });
+// });
+
+routers.post("/users", async (req, res) => {
+  const { name, age, status } = req.body;
+  const newUser = await Users.create({
+    name: name,
+    age: age,
+    status: status,
+  });
+  res.json({
+    status: "success",
+    message: "insert users",
+    data: newUser,
+  });
+});
+
+// routers.get("/users", async (req, res) => {
+//   try {
+//     const db = client.db("latihan");
+//     const users = await db.collection("users").find().toArray();
+//     res.json({
+//       status: "success",
+//       message: "list users",
+//       data: users,
+//     });
+//   } catch (error) {
+//     res.json({
+//       status: "error",
+//     });
+//   }
+// });
+
+// // Get single user
 // routers.get("/users/:id", async (req, res) => {
 //   try {
 //     const db = client.db("latihan");
@@ -48,25 +88,28 @@ routers.get("/users", async (req, res) => {
 //   }
 // });
 
-//GET
+// Insert user
+
+// Update user
+
+// Delete user
+
+// Get order user (join/aggregate)
+
+routers.post("/upload", upload.single("file"), (req, res) => {
+  const file = req.file;
+  if (file) {
+    const target = path.join(__dirname, "public", file.originalname);
+    fs.renameSync(file.path, target); //rename file agar sama dengan original file name
+    res.send("file berhasil diupload");
+  } else {
+    res.send("file gagal diupload");
+  }
+});
+
 routers.get("/download", (req, res) => {
   const filename = "dummy.png";
   res.download(path.join(__dirname, "/download", filename), "dummy-photo.png");
-});
-
-//POST
-routers.post("/users", async (req, res) => {
-  const user = new Users({
-    name: "Jack",
-    age: 30,
-    status: "active",
-  });
-  await user.save();
-  res.status(201).json({
-    status: "success",
-    message: "insert users",
-    data: user,
-  });
 });
 
 routers.post("/login", (req, res) => {
@@ -80,7 +123,6 @@ routers.post("/login", (req, res) => {
     },
   });
 });
-
 routers.get("/", (req, res) => res.send("Hello World"));
 routers.get("/about", (req, res) =>
   res.status(200).json({
